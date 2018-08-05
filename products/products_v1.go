@@ -18,7 +18,13 @@ import (
 func ProductsOrdSqnc(ginctx *gin.Context) {
   aectx := appengine.NewContext(ginctx.Request)
   var err error
-  query := datastore.NewQuery("Product").Order("Title").Limit(10)
+  ordSqnce := ginctx.Param("OrdSqnce")
+  OrdSqnce := OrderSquence(ginctx, ordSqnce)
+  if OrdSqnce == "" {
+    ginctx.JSON(http.StatusOK, gin.H{"Error": "Order Squence not found"})
+    return
+  }
+  query := datastore.NewQuery("Product").Order(OrdSqnce).Limit(10)
   var products []Product
   keys, err := query.GetAll(aectx, &products)
   if err != nil {
@@ -29,4 +35,10 @@ func ProductsOrdSqnc(ginctx *gin.Context) {
     products[inx].Id = key.IntID()
   }
   ginctx.JSON(http.StatusOK, gin.H{"keys": keys, "products": products})
+}
+
+func OrderSquence(ginctx *gin.Context, ordSqnce string) (string) {
+  var OrderSquences = map[string]string {"PriceAsc": "Price", "PriceDesc": "-Price", "DiscountAsc": "Discount", "DiscountDesc": "-Discount"}
+  OrdSqnce := OrderSquences[ordSqnce]
+  return OrdSqnce
 }
