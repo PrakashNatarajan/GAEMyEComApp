@@ -1,0 +1,20 @@
+dispatch:
+  # Default service serves the typical web resources and all static resources.
+  - url: "*/favicon.ico"
+    service: default
+
+  # Default service serves simple hostname request.
+  - url: "api-project-627243613642.appspot.com/"
+    service: default
+
+  # Send all products traffic to the products management system.
+  - url: "products.api-project-627243613642.appspot.com/*"
+    service: products
+
+  # Send all orders traffic to the orders management system.
+  - url: "orders.api-project-627243613642.appspot.com/*"
+    service: orders
+
+  # Send all users traffic to the users management system.
+  - url: "users.api-project-627243613642.appspot.com/*"
+    service: users

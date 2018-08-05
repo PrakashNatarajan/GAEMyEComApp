@@ -1,0 +1,12 @@
+service: products
+runtime: go
+api_version: go1
+
+handlers:
+#- url: /products/.* ##This is For Subdomain
+- url: /.*
+  script: _go_app
+
+automatic_scaling:
+  min_idle_instances: 2
+  max_pending_latency: 1s
