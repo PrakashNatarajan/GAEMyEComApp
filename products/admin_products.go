@@ -172,6 +172,7 @@ func DeleteProduct(ginctx *gin.Context) {
 type Item struct {
   ProdId  int64 `json:"ProdId"`
   Quantity  int `json:"Quantity"`
+  CreatedAt time.Time `json:"CreatedAt"`
 }
 
 func UpdateProductOrdCnt(ginctx *gin.Context) {
