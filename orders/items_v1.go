@@ -87,6 +87,13 @@ func CreateItemV1(ginctx *gin.Context) {
     return
   }
   // [END get_Id]
+  Qnty := ginctx.PostForm("Quantity")
+  Qunty, err := strconv.ParseInt(Qnty, 5, 32)
+  if err != nil {
+    ginctx.JSON(http.StatusOK, gin.H{"Error": err.Error()})
+    return
+  }
+  Quantity := int32(Qunty)
 
   Amt := ginctx.PostForm("Amount")
   Amnt, err := strconv.ParseFloat(Amt, 32)
@@ -110,6 +117,7 @@ func CreateItemV1(ginctx *gin.Context) {
   item := Item{
     UserId:  UserId,
     ProdId: PrdId,
+    Quantity: Quantity,
     Amount: Amount,
     Discount: Discount,
     TtlAmount: TtlAmount,

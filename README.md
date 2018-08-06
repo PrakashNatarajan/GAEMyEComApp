@@ -5,7 +5,7 @@ Run The Main(Default) Service.
 Run The Order Service.
 `/home/prakash/GoogleCloudSdk/bin/dev_appserver.py orders/orders.yaml`
 
-Importtant:
+Important:
 Data will be created in the local system when running the app in local.
 
 Deploy The App in Google App Engine.

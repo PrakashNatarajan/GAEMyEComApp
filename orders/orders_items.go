@@ -56,6 +56,7 @@ type Item struct {
   Id      int64  `json:"id" datastore:"-"`
   UserId   int64 `json:"UserId"`
   ProdId  int64 `json:"ProdId"`
+  Quantity  int32 `json:"Quantity"`
   OrderId  int64 `json:"UserId"`
   Amount float32 `json:"Amount"`
   Discount float32 `json:"Discount"`

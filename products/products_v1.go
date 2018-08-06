@@ -38,7 +38,7 @@ func ProductsOrdSqnc(ginctx *gin.Context) {
 }
 
 func OrderSquence(ginctx *gin.Context, ordSqnce string) (string) {
-  var OrderSquences = map[string]string {"PriceAsc": "Price", "PriceDesc": "-Price", "DiscountAsc": "Discount", "DiscountDesc": "-Discount"}
+  var OrderSquences = map[string]string {"PriceAsc": "Price", "PriceDesc": "-Price", "DiscountAsc": "Discount", "DiscountDesc": "-Discount", "Popularity": "-OrderCount"}
   OrdSqnce := OrderSquences[ordSqnce]
   return OrdSqnce
 }
