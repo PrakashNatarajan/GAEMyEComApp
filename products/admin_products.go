@@ -192,7 +192,7 @@ func UpdateProductOrdCnt(ginctx *gin.Context) {
   for page := 0; page < pagesCount; page++ {
     err := ProductOrdersCount(ginctx, dateTime, limit, page)
     if err != nil {
-      ginctx.JSON(http.StatusOK, gin.H{"Error": err.Error()})
+      ginctx.JSON(503, gin.H{"Error": err.Error()})
       return
       //break
     }
@@ -204,16 +204,17 @@ func UpdateProductOrdCnt(ginctx *gin.Context) {
 func ProductOrdersCount(ginctx *gin.Context, dateTime time.Time, limit, page int) (err error) {
   aectx := appengine.NewContext(ginctx.Request)
   query := datastore.NewQuery("Item").Project("ProdId").Filter("CreatedAt <", dateTime).Offset(page).Limit(limit)
-  var prodIds []int64
+  var prodIds []Item
   prodKeys, err := query.GetAll(aectx, &prodIds)
   if err != nil {
     return err
   }
+  fmt.Println(prodKeys)
+  var items []Item
   var product Product
   for inx, _ := range prodKeys {
-    ProdId := prodIds[inx]
-    query := datastore.NewQuery("Item").Project("ProdId", "Quantity").Filter("CreatedAt <", dateTime).Filter("ProdId =", ProdId).Limit(1000)
-    var items []Item
+    ProdId := prodIds[inx].ProdId
+    query := datastore.NewQuery("Item").Project("ProdId").Project("Quantity").Filter("CreatedAt <", dateTime).Filter("ProdId =", ProdId).Limit(1000)
     _, err := query.GetAll(aectx, &items)
     if err != nil {
       return err
