@@ -41,7 +41,7 @@ type Product struct {
   Price float32 `json:"Price"`
   Discount float32 `json:"Discount"`
   ImageUrl  string `json:"ImageUrl"`
-  OrderCount float32 `json:"OrderCount"`
+  OrderCount int32 `json:"OrderCount"`
   CreatedAt time.Time `json:"CreatedAt"`
   UpdatedAt time.Time `json:"UpdatedAt"`
 }
