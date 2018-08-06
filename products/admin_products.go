@@ -168,3 +168,53 @@ func DeleteProduct(ginctx *gin.Context) {
   ginctx.JSON(http.StatusOK, gin.H{"Message": "Successfully deleted"})
 }
 
+func UpdateProductOrdCnt(ginctx *gin.Context) {
+  // [START new_context]
+  aectx := appengine.NewContext(ginctx.Request)
+  // [END new_context]
+
+  // [START get_Id]
+  //path := req.URL.Path
+  //Id := strings.TrimPrefix(path, "/UpdateProduct/")
+  Id := ginctx.Param("Id")
+  prdId, err := strconv.ParseInt(Id, 10, 64)
+  if err != nil {
+    ginctx.JSON(http.StatusOK, gin.H{"Error": err.Error()})
+    return
+  }
+  // [END get_Id]
+
+  // [START exist_key]
+  key := datastore.NewKey(aectx, "Product", "", prdId, nil)
+  // [END exist_key]
+
+  var product Product
+  err = datastore.Get(aectx, key, &product)
+  if err != nil {
+    ginctx.JSON(http.StatusOK, gin.H{"Error": err.Error()})
+    return
+  }
+  // It's a product request, so handle the form submission.
+  // [START exist_product]
+  product.Id = prdId
+  product.Title = ginctx.PostForm("title")
+  product.Description = ginctx.PostForm("Description")
+  product.UpdatedAt = time.Now()
+  // [END exist_product]
+
+  if product.Title == "" {
+    ginctx.JSON(http.StatusOK, gin.H{"Error": "Title must be there"})
+    return
+  }
+
+  // [START add_product]
+  fmt.Println(product)
+  prdKey, err := datastore.Put(aectx, key, &product)
+  if err != nil {
+    ginctx.JSON(http.StatusOK, gin.H{"Error": err.Error()})
+    return
+  }
+  // [END add_product]
+  product.Id = prdKey.IntID()
+  ginctx.JSON(http.StatusOK, gin.H{"Product": product})
+}

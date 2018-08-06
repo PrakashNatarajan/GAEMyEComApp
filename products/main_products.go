@@ -27,6 +27,7 @@ func init() {
   admin.POST("/products", CreateProduct)
   admin.PUT("/products/:Id", UpdateProduct)
   admin.DELETE("/products/:Id", DeleteProduct)
+  admin.PUT("/productsordcnt", UpdateProductOrdCnt)
 
   v1 := router.Group("/v1")
   v1.GET("/products/:OrdSqnce", ProductsOrdSqnc)
