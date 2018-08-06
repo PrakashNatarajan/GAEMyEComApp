@@ -88,12 +88,11 @@ func CreateItemV1(ginctx *gin.Context) {
   }
   // [END get_Id]
   Qnty := ginctx.PostForm("Quantity")
-  Qunty, err := strconv.ParseInt(Qnty, 5, 32)
+  Quantity, err := strconv.Atoi(Qnty)
   if err != nil {
     ginctx.JSON(http.StatusOK, gin.H{"Error": err.Error()})
     return
   }
-  Quantity := int32(Qunty)
 
   Amt := ginctx.PostForm("Amount")
   Amnt, err := strconv.ParseFloat(Amt, 32)
