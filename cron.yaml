@@ -1,6 +1,6 @@
 cron:
 - description: "Daily Orders Count Update job in Products"
-  url: /tasks/summary
+  url: /admin/products/orderscount
   target: products
   schedule: every 10 mins
   retry_parameters:

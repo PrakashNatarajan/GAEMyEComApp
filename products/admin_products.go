@@ -168,53 +168,74 @@ func DeleteProduct(ginctx *gin.Context) {
   ginctx.JSON(http.StatusOK, gin.H{"Message": "Successfully deleted"})
 }
 
+
+type Item struct {
+  ProdId  int64 `json:"ProdId"`
+  Quantity  int `json:"Quantity"`
+}
+
 func UpdateProductOrdCnt(ginctx *gin.Context) {
-  // [START new_context]
   aectx := appengine.NewContext(ginctx.Request)
-  // [END new_context]
 
-  // [START get_Id]
-  //path := req.URL.Path
-  //Id := strings.TrimPrefix(path, "/UpdateProduct/")
-  Id := ginctx.Param("Id")
-  prdId, err := strconv.ParseInt(Id, 10, 64)
+  dateTime := time.Now()
+  limit := 100
+
+  query := datastore.NewQuery("Item").Filter("CreatedAt <", dateTime)
+  itemCount, err := query.Count(aectx)
   if err != nil {
     ginctx.JSON(http.StatusOK, gin.H{"Error": err.Error()})
     return
   }
-  // [END get_Id]
 
-  // [START exist_key]
-  key := datastore.NewKey(aectx, "Product", "", prdId, nil)
-  // [END exist_key]
+  pagesCount := (itemCount/limit) + 1
 
+  for page := 0; page < pagesCount; page++ {
+    err := ProductOrdersCount(ginctx, dateTime, limit, page)
+    if err != nil {
+      ginctx.JSON(http.StatusOK, gin.H{"Error": err.Error()})
+      return
+      //break
+    }
+  }
+
+  ginctx.JSON(http.StatusOK, gin.H{"message": "Successfully updated products orders count"})
+}
+
+func ProductOrdersCount(ginctx *gin.Context, dateTime time.Time, limit, page int) (err error) {
+  aectx := appengine.NewContext(ginctx.Request)
+  query := datastore.NewQuery("Item").Project("ProdId").Filter("CreatedAt <", dateTime).Offset(page).Limit(limit)
+  var prodIds []int64
+  prodKeys, err := query.GetAll(aectx, &prodIds)
+  if err != nil {
+    return err
+  }
   var product Product
-  err = datastore.Get(aectx, key, &product)
-  if err != nil {
-    ginctx.JSON(http.StatusOK, gin.H{"Error": err.Error()})
-    return
-  }
-  // It's a product request, so handle the form submission.
-  // [START exist_product]
-  product.Id = prdId
-  product.Title = ginctx.PostForm("title")
-  product.Description = ginctx.PostForm("Description")
-  product.UpdatedAt = time.Now()
-  // [END exist_product]
+  for inx, _ := range prodKeys {
+    ProdId := prodIds[inx]
+    query := datastore.NewQuery("Item").Project("ProdId", "Quantity").Filter("CreatedAt <", dateTime).Filter("ProdId =", ProdId).Limit(1000)
+    var items []Item
+    _, err := query.GetAll(aectx, &items)
+    if err != nil {
+      return err
+    }
 
-  if product.Title == "" {
-    ginctx.JSON(http.StatusOK, gin.H{"Error": "Title must be there"})
-    return
-  }
+    OrderCount := 0
+    for inx, _ := range items {
+      OrderCount += items[inx].Quantity
+    }
 
-  // [START add_product]
-  fmt.Println(product)
-  prdKey, err := datastore.Put(aectx, key, &product)
-  if err != nil {
-    ginctx.JSON(http.StatusOK, gin.H{"Error": err.Error()})
-    return
+    key := datastore.NewKey(aectx, "Product", "", ProdId, nil)
+    // [END exist_key]
+
+    err = datastore.Get(aectx, key, &product)
+    if err != nil {
+      return err
+    }
+    product.OrderCount = int32(OrderCount)
+    _, err = datastore.Put(aectx, key, &product)
+    if err != nil {
+      return err
+    }
   }
-  // [END add_product]
-  product.Id = prdKey.IntID()
-  ginctx.JSON(http.StatusOK, gin.H{"Product": product})
+  return err
 }
