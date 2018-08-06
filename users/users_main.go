@@ -46,6 +46,7 @@ type User struct {
   EmailId   string `json:"EmailId"`
   Password string `json:"Password"`
   FullName string `json:"FullName"`
+  AccessToken string `json:"AccessToken"`
 }
 
 

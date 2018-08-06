@@ -83,10 +83,10 @@ func LoginUserV1(ginctx *gin.Context) {
     return
   }
 
-  var err error
+  //var err error
   query := datastore.NewQuery("User").Filter("EmailId =", EmailId).Filter("Password =", Password).Limit(1)
   var users []User
-  _, err = query.GetAll(aectx, &users)
+  usrKeys, err := query.GetAll(aectx, &users)
   if err != nil {
     ginctx.JSON(http.StatusOK, gin.H{"Error": err.Error()})
     return
@@ -97,8 +97,15 @@ func LoginUserV1(ginctx *gin.Context) {
   }
 
   user := users[0]
+  key := usrKeys[0]
   accessToken := GenerateAccessToken(user.EmailId, true)
-
+  user.AccessToken = accessToken
+  
+  _, err = datastore.Put(aectx, key, &user)
+  if err != nil {
+    ginctx.JSON(http.StatusOK, gin.H{"Error": err.Error()})
+    return
+  }
   ginctx.JSON(http.StatusOK, gin.H{"accesstoken": accessToken})
 }
 
