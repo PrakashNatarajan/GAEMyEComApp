@@ -17,6 +17,7 @@ import (
     "github.com/gin-gonic/gin"
 	  "google.golang.org/appengine"
     "google.golang.org/appengine/datastore"
+    "google.golang.org/appengine/log"
 )
 
 
@@ -184,6 +185,7 @@ func UpdateProductOrdCnt(ginctx *gin.Context) {
   query := datastore.NewQuery("Item").Filter("CreatedAt <", dateTime)
   itemCount, err := query.Count(aectx)
   if err != nil {
+    log.Errorf(aectx, "Failed to retrieve Item: %v", err)
     ginctx.JSON(http.StatusOK, gin.H{"Error": err.Error()})
     return
   }
@@ -208,6 +210,7 @@ func ProductOrdersCount(ginctx *gin.Context, dateTime time.Time, limit, page int
   var prodIds []Item
   prodKeys, err := query.GetAll(aectx, &prodIds)
   if err != nil {
+    log.Errorf(aectx, "Failed to retrieve Item only with ProdId: %v", err)
     return err
   }
   fmt.Println(prodKeys)
@@ -218,6 +221,7 @@ func ProductOrdersCount(ginctx *gin.Context, dateTime time.Time, limit, page int
     query := datastore.NewQuery("Item").Project("ProdId").Project("Quantity").Filter("CreatedAt <", dateTime).Filter("ProdId =", ProdId).Limit(1000)
     _, err := query.GetAll(aectx, &items)
     if err != nil {
+      log.Errorf(aectx, "Failed to retrieve Item only with ProdId and Quantity: %v", err)
       return err
     }
 
@@ -231,11 +235,13 @@ func ProductOrdersCount(ginctx *gin.Context, dateTime time.Time, limit, page int
 
     err = datastore.Get(aectx, key, &product)
     if err != nil {
+      log.Errorf(aectx, "Failed to retrieve Product: %v", err)
       return err
     }
     product.OrderCount = int32(OrderCount)
     _, err = datastore.Put(aectx, key, &product)
     if err != nil {
+      log.Errorf(aectx, "Failed to Update Product: %v", err)
       return err
     }
   }
