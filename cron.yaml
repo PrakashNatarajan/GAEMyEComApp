@@ -1,8 +1,8 @@
 cron:
 - description: "Daily Orders Count Update job in Products"
-  url: /admin/products/orderscount
+  url: /admin/auto/prdordcount
   target: products
-  schedule: every 50 mins
+  schedule: every 10 mins
   retry_parameters:
     min_backoff_seconds: 2.5
     max_doublings: 5

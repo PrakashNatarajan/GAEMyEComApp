@@ -248,3 +248,34 @@ func ProductOrdersCount(ginctx *gin.Context, dateTime time.Time, limit, page int
   }
   return err
 }
+
+func AdminGetProduct(ginctx *gin.Context) {
+  // [START new_context]
+  aectx := appengine.NewContext(ginctx.Request)
+  // [END new_context]
+
+  // [START get_Id]
+  //path := req.URL.Path
+  //Id := strings.TrimPrefix(path, "/UpdateProduct/")
+  Id := ginctx.Param("Id")
+  prdId, err := strconv.ParseInt(Id, 10, 64)
+  if err != nil {
+    ginctx.JSON(http.StatusOK, gin.H{"Error": err.Error()})
+    return
+  }
+  // [END get_Id]
+
+  // [START exist_key]
+  prdKey := datastore.NewKey(aectx, "Product", "", prdId, nil)
+  // [END exist_key]
+
+  var product Product
+  err = datastore.Get(aectx, prdKey, &product)
+  if err != nil {
+    ginctx.JSON(http.StatusOK, gin.H{"Error": err.Error()})
+    return
+  }
+
+  product.Id = prdKey.IntID()
+  ginctx.JSON(http.StatusOK, gin.H{"Product": product})
+}

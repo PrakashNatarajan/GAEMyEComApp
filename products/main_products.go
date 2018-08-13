@@ -24,13 +24,15 @@ func init() {
 
   admin := router.Group("/admin")
   admin.GET("/products", ProductsList)
+  admin.GET("/products/:Id", AdminGetProduct)
   admin.POST("/products", CreateProduct)
   admin.PUT("/products/:Id", UpdateProduct)
   admin.DELETE("/products/:Id", DeleteProduct)
-  admin.GET("/products/orderscount", UpdateProductOrdCnt)
+  admin.GET("/auto/prdordcount", UpdateProductOrdCnt)
 
   v1 := router.Group("/v1")
-  v1.GET("/products/:OrdSqnce", ProductsOrdSqnc)
+  v1.GET("/product/:OrdSqnce/list", ProductsOrdSqnc)
+  v1.GET("/products/:Id", GetProductV1)
   // Handle all requests using net/http
   http.Handle("/", router)
 }
