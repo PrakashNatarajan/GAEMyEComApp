@@ -195,8 +195,8 @@ func UpdateProductOrdCnt(ginctx *gin.Context) {
   for page := 0; page < pagesCount; page++ {
     err := ProductOrdersCount(ginctx, dateTime, limit, page)
     if err != nil {
-      ginctx.JSON(200, gin.H{"Error": err.Error()})
-      //ginctx.JSON(503, gin.H{"Error": err.Error()}) ##Need to fix an error
+      //ginctx.JSON(200, gin.H{"Error": err.Error()})
+      ginctx.JSON(503, gin.H{"Error": err.Error()}) ##Need to fix an error
       return
       //break
     }
